@@ -7,11 +7,15 @@ library("dplyr")
 library("pbapply")
 library("parallel")
 
-library("GOSemSim")
-library("org.Hs.eg.db")
-goDataCC <- godata(annoDb = "org.Hs.eg.db", ont="CC", computeIC=FALSE)
-goDataMF <- godata(annoDb = "org.Hs.eg.db", ont="MF", computeIC=FALSE)
-goDataBP <- godata(annoDb = "org.Hs.eg.db", ont="BP", computeIC=FALSE)
+if (!exists("GOSemSimLoaded")) {
+    GOSemSimLoaded <- TRUE
+
+    library("GOSemSim")
+    library("org.Hs.eg.db")
+    goDataCC <- godata(annoDb = "org.Hs.eg.db", ont="CC", computeIC=FALSE)
+    goDataMF <- godata(annoDb = "org.Hs.eg.db", ont="MF", computeIC=FALSE)
+    goDataBP <- godata(annoDb = "org.Hs.eg.db", ont="BP", computeIC=FALSE)
+}
 
 # Find the average shortest distances between two sets of nodes
 # Implements formula: s_AB = d_AB - (d_AA + d_BB)/2
@@ -53,7 +57,7 @@ overlapDist <- function(graph, nodeset1, nodeset2) {
 # Ensure go data is preprocessed for function to work (should occur when you run this script)
 # `out` can be "all", "max", "min", or "mean"; `out` is ignored if `type` is not "all"
 # `type` can be "CC" (Cellular Component), "MF" (Molecular Function), "BP" (Biological Process), or "all"
-funcDist <- function(graph, nodeset1, nodeset2, out = "min", type = "BP") {
+funcDist <- function(graph, nodeset1, nodeset2, type = "BP", out = "min") {
     set1 <- select(org.Hs.eg.db,
         keys = names(nodeset1),
         columns = "ENTREZID",
@@ -144,6 +148,18 @@ findDrugDist <- function(graph, disease, minSep = 0, maxSep = 0, distFun = topDi
 # the distance function `distFun` 
 checkDrugComb <- function(graph, disease, drugComb, distFun = topDist) {
     drugComb <- unlist(drugComb)
+
+    if (!(disease %in% V(graph)$name)) {
+        print("Error: No disease")
+        return("Error: No disease")
+    }
+
+    if (lapply(drugComb, function(x) !(x %in% V(graph)$name)) %>%
+        unlist() %>%
+        any()) {
+            print("Error: No drug")
+        return("Error: No drug")
+    }
 
     diseaseCluster <- neighbors(graph, disease, mode = "out")
     drugCluster <- lapply(V(graph)[drugComb], function(x) neighbors(graph, x, mode = "out"))

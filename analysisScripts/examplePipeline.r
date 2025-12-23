@@ -3,18 +3,28 @@
 # drug combinations
 #
 
-source("analysisScripts/filterNodes.r")
-source("analysisScripts/filterEdges.r")
+# source("analysisScripts/filterNodes.r")
+# source("analysisScripts/filterEdges.r")
+source("analysisScripts/buildGraph.r")
+source("analysisScripts/filters.r")
 source("analysisScripts/findDistance.r")
 source("analysisScripts/findDrugs.r")
+
+drugs <- fromJSON("clean/drugs.json")
+ppi <- fromJSON("clean/ppi.json")
+disease <- fromJSON("clean/disease.json")
 
 ################################################################################
 
 chosenDisease <- "ALZHEIMER DISEASE 2"
 
-g <- readRDS("clean/baseGraph.rds")
-g <- e.filter.subcell(g)
-g <- e.filter.tissue(g)
+baseg <- readRDS("clean/baseGraph.rds")
+# g <- e.filter.subcell(g)
+# g <- e.filter.tissue(g)
+
+ppiFiltered <- e.filter.subcell(ppi, subcell)
+ppiFiltered <- e.filter(ppiFiltered, tissue)
+g <- buildGraph(ppiFiltered, drugs, disease)
 
 drugDist <- findDrugDist(g, chosenDisease, 0, 0)
 drugPairs <- findDrugPairs(g, drugDist)

@@ -3,3 +3,5 @@ clean/cellLine.tsv
 clean/cellType.json
 .lintr
 report
+knownCombsLLM
+CDCDB
