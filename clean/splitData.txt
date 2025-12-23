@@ -1,1 +1,1 @@
-clean/cellLine.tsv clean/cellType.json
+../clean/cellLine.tsv ../clean/cellType.json

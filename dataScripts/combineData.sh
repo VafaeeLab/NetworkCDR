@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-FILES=$(cat clean/splitData.txt)
+FILES=$(cat ../clean/splitData.txt)
 
 for file in $FILES; do
     if [ -e $file ]; then

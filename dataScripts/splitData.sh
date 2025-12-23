@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-FILES=$(find clean/* -type f -size +50M)
+FILES=$(find ../clean/* -type f -size +50M)
 
 for file in $FILES; do
     gzip -S .zip "$file"
@@ -8,4 +8,4 @@ for file in $FILES; do
     rm "$file.zip"
 done
 
-echo $FILES > "clean/splitData.txt"
+echo $FILES > "../clean/splitData.txt"
